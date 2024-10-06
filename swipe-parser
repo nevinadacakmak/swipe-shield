@@ -10,13 +10,13 @@ with open("swipe") as file:
         if len(split) >= 4 and split[4] == 'ABS_MT_POSITION_X':
             y = file.readline()
             if y != '' and y.split()[4] == 'ABS_MT_POSITION_Y':
-                lines.append([str(int(split[5], 16)), str(int(y.split()[5], 16)), split[1][:-1]])
+                lines.append([str(int(split[5], 16)), str(int(y.split()[5], 16)), split[1][:-1], sys.argv[1]])
 
         line = file.readline()
 
 
 with open('swipe.csv', 'w') as file:
     for line in lines:
-        file.write(str(line)[1:-1].replace("'", '') + ', ' + sys.argv[1] + '\n')
+        file.write(str(line)[1:-1].replace("'", '') + '\n')
 
 
