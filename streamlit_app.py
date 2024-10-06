@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
+import os
 
 # Set up the page
 st.set_page_config(page_title="SwipeGuard: Swipe Authentication", layout="wide")
@@ -146,6 +147,7 @@ if page == "Security System":
         st.success("User swipes detected: Phone is secure!")
     else:
         st.error("Non-user swipes detected: Take security action!")
+        os.system('./lock')
 
 # Footer
 st.sidebar.markdown("### Created by SwipeGuard Team")

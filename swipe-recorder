@@ -1,13 +1,19 @@
 #!/bin/bash
 
+file='sample_swipe_data.csv'
+
+id=0
+
 adb shell getevent -lt | grep -e 'UP' -e 'DOWN' -e 'POS' | { while IFS= read -r line; do 
 if [[ $line == *"DOWN"* ]]; then
+    id=$(python -c "print(int('$(tail -n 1 $file)'.split(' ')[-1])+1)")
     echo "" > swipe
 elif [[ $line == *"UP"* ]]; then
-    python swipe-parser
-    echo parsed
+    python swipe-parser $id
+    
+    cat swipe.csv >> $file
 
-    # check if the swipe was legal
+    python streamlit_app.py
 
 else 
     echo $line >> swipe;
