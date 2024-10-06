@@ -43,8 +43,8 @@ if page == "Data":
     """)
 
     # Load sample data and clean it
-    file_path = 'sample_swipe_data.csv'  # Change this to your actual file path
-    expected_columns = 5  # Set this to the expected number of columns in your CSV
+    file_path = 'sample_swipe_data.csv'
+    expected_columns = 4
     
     try:
         # Read the CSV file
