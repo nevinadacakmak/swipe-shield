@@ -41,10 +41,33 @@ if page == "Data":
     st.markdown("""
     We collected swipe data from our devices using Android Debug Bridge (ADB). The raw data was cleaned and prepared for machine learning by removing missing values and sorting by swipe_id and timestamp.
     """)
+
+    # Load sample data and clean it
+    file_path = 'sample_swipe_data.csv'  # Change this to your actual file path
+    expected_columns = 5  # Set this to the expected number of columns in your CSV
     
-    # Load sample data
-    data = pd.read_csv('sample_swipe_data.csv')
-    st.dataframe(data.head())
+    try:
+        # Read the CSV file
+        data = pd.read_csv(file_path)
+
+        # Check the initial shape of the DataFrame
+        st.write(f"Initial data shape: {data.shape}")
+
+        # Remove rows with broken lines (i.e., rows that do not have the expected number of columns)
+        cleaned_data = data.dropna(thresh=expected_columns, axis=0)
+
+        # Check the shape after cleaning
+        st.write(f"Cleaned data shape: {cleaned_data.shape}")
+
+        # Display cleaned data
+        st.dataframe(cleaned_data.head())
+        
+        # Save cleaned data to a new CSV file (optional)
+        cleaned_data.to_csv('cleaned_sample_swipe_data.csv', index=False)
+        st.success("Cleaned data saved to 'cleaned_sample_swipe_data.csv'")
+
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
 
     st.markdown("""
     **Key Data Columns:**
@@ -61,7 +84,7 @@ if page == "Clustering Demo":
     st.markdown("Using K-Means clustering to classify swipes into two categories: user and non-user.")
     
     # Load and preprocess the data
-    data = pd.read_csv('sample_swipe_data.csv')
+    data = pd.read_csv('cleaned_sample_swipe_data.csv')  # Use cleaned data
     data['timestamp'] = pd.to_numeric(data['timestamp'], errors='coerce')
     data = data.dropna(subset=['x_coordinate', 'y_coordinate', 'timestamp', 'swipe_id'])
     data = data.sort_values(by=['swipe_id', 'timestamp'])
@@ -104,7 +127,7 @@ if page == "Clustering Demo":
 
 # Security System Section
 if page == "Security System":
-    data = pd.read_csv('sample_swipe_data.csv')
+    data = pd.read_csv('cleaned_sample_swipe_data.csv')  # Use cleaned data
     data['timestamp'] = pd.to_numeric(data['timestamp'], errors='coerce')
     data = data.dropna(subset=['x_coordinate', 'y_coordinate', 'timestamp', 'swipe_id'])
     data = data.sort_values(by=['swipe_id', 'timestamp'])
