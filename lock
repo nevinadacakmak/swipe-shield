@@ -1,1 +1,1 @@
-adb shell input keyevent 26; adb shell input keyevent 26; sleep 0.5s; adb shell input swipe 250 800 250 200 100
+adb shell input keyevent 26; sleep 0.1s; adb shell input keyevent 26; sleep 0.5s; adb shell input swipe 250 800 250 200 100
