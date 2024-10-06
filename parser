@@ -1,0 +1,43 @@
+#!/usr/bin/python
+import csv
+
+lines = []
+with open("data") as file:
+    line = file.readline()
+    while line != "":
+        split = line.split()
+        print(split)
+        if split[4] == 'ABS_MT_POSITION_X':
+            y = file.readline()
+            print(y.split())
+            if y != '' and y.split()[4] == 'ABS_MT_POSITION_Y':
+                lines.append([str(int(split[5], 16)), str(int(y.split()[5], 16)), split[1][:-1]])
+        if split[5] == 'DOWN':
+            lines.insert(-2, [split[5], float(split[1][:-1])])
+        if split[5] == 'UP':
+            lines.append([split[5], float(split[1][:-1])])
+
+        line = file.readline()
+
+
+swipes = []
+swipe_num = 0
+swipe = []
+for i in range(len(lines)):
+    if lines[i][0] == 'UP':
+        swipe = []
+    elif lines[i][0] == 'DOWN':
+        swipe_num += 1
+        for point in swipe:
+            point.append(swipe_num)
+        swipes.append(swipe)
+    else:
+        swipe.append(lines[i])
+
+
+with open('data.csv', 'w') as file:
+    for swipe in swipes:
+        for point in swipe:
+            file.write(str(point)[1:-1].replace("'", '') + '\n')
+
+

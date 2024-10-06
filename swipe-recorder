@@ -1,0 +1,18 @@
+#!/bin/bash
+
+adb shell getevent -lt | grep -e 'UP' -e 'DOWN' -e 'POS' | { while IFS= read -r line; do 
+if [[ $line == *"DOWN"* ]]; then
+    echo "" > swipe
+elif [[ $line == *"UP"* ]]; then
+    python swipe-parser
+    echo parsed
+
+    # check if the swipe was legal
+
+else 
+    echo $line >> swipe;
+fi
+
+done;
+}
+

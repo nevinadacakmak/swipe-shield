@@ -1,0 +1,13 @@
+#!/bin/bash
+
+adb logcat ActivityTaskManager:I *:S | { while IFS= read -r line; do 
+
+
+    if [[ "$line" == *"START u0"* ]]; then
+        app=$(python -c "list='$line'.split(' '); print([s for s in list if 'pkg' in s or 'cmp' in s][0].split('=')[1])")
+        echo $app
+    fi
+    done;
+}
+    
+
