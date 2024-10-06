@@ -15,6 +15,32 @@ st.sidebar.title("SwipeGuard Project")
 st.sidebar.header("Menu")
 page = st.sidebar.selectbox("Choose a section", ["Project Overview", "Data", "Clustering Demo", "Security System"])
 
+# Load and preprocess the data
+data = pd.read_csv('sample_swipe_data.csv')  # Use cleaned data!
+data['timestamp'] = pd.to_numeric(data['timestamp'], errors='coerce')
+data = data.dropna(subset=['x_coordinate', 'y_coordinate', 'timestamp', 'swipe_id'])
+data = data.sort_values(by=['swipe_id', 'timestamp'])
+
+# Calculate offsets and time differences
+starting_points = data.groupby('swipe_id').agg({
+    'x_coordinate': 'first',
+    'y_coordinate': 'first'
+}).reset_index().rename(columns={'x_coordinate': 'start_x', 'y_coordinate': 'start_y'})
+data = data.merge(starting_points, on='swipe_id', how='left')
+data['x_offset'] = data['x_coordinate'] - data['start_x']
+data['y_offset'] = data['y_coordinate'] - data['start_y']
+data['time_diff'] = data.groupby('swipe_id')['timestamp'].diff().fillna(0)
+
+# Prepare features
+features = data[['x_offset', 'y_offset', 'time_diff', 'x_coordinate', 'y_coordinate']]
+scaler = StandardScaler()
+features_scaled = scaler.fit_transform(features)
+
+# Apply K-Means clustering
+kmeans = KMeans(n_clusters=2)
+kmeans.fit(features_scaled)
+data['cluster'] = kmeans.labels_
+
 # Project Overview Section
 if page == "Project Overview":
     st.title("SwipeGuard: Swipe-Based Phone Authentication")
@@ -42,33 +68,6 @@ if page == "Data":
     We collected swipe data from our devices using Android Debug Bridge (ADB). The raw data was cleaned and prepared for machine learning by removing missing values and sorting by swipe_id and timestamp.
     """)
 
-    # Load sample data and clean it
-    file_path = 'sample_swipe_data.csv'
-    expected_columns = 4
-    
-    try:
-        # Read the CSV file
-        data = pd.read_csv(file_path)
-
-        # Check the initial shape of the DataFrame
-        st.write(f"Initial data shape: {data.shape}")
-
-        # Remove rows with broken lines (i.e., rows that do not have the expected number of columns)
-        cleaned_data = data.dropna(thresh=expected_columns, axis=0)
-
-        # Check the shape after cleaning
-        st.write(f"Cleaned data shape: {cleaned_data.shape}")
-
-        # Display cleaned data
-        st.dataframe(cleaned_data.head())
-        
-        # Save cleaned data to a new CSV file (optional)
-        cleaned_data.to_csv('cleaned_sample_swipe_data.csv', index=False)
-        st.success("Cleaned data saved to 'cleaned_sample_swipe_data.csv'")
-
-    except Exception as e:
-        st.error(f"An error occurred: {e}")
-
     st.markdown("""
     **Key Data Columns:**
     - `x_coordinate`: The X position of the swipe.
@@ -82,32 +81,6 @@ if page == "Clustering Demo":
     st.title("Swipe Classification Demo")
     
     st.markdown("Using K-Means clustering to classify swipes into two categories: user and non-user.")
-    
-    # Load and preprocess the data
-    data = pd.read_csv('sample_swipe_data.csv')  # Use cleaned data!
-    data['timestamp'] = pd.to_numeric(data['timestamp'], errors='coerce')
-    data = data.dropna(subset=['x_coordinate', 'y_coordinate', 'timestamp', 'swipe_id'])
-    data = data.sort_values(by=['swipe_id', 'timestamp'])
-    
-    # Calculate offsets and time differences
-    starting_points = data.groupby('swipe_id').agg({
-        'x_coordinate': 'first',
-        'y_coordinate': 'first'
-    }).reset_index().rename(columns={'x_coordinate': 'start_x', 'y_coordinate': 'start_y'})
-    data = data.merge(starting_points, on='swipe_id', how='left')
-    data['x_offset'] = data['x_coordinate'] - data['start_x']
-    data['y_offset'] = data['y_coordinate'] - data['start_y']
-    data['time_diff'] = data.groupby('swipe_id')['timestamp'].diff().fillna(0)
-
-    # Prepare features
-    features = data[['x_offset', 'y_offset', 'time_diff', 'x_coordinate', 'y_coordinate']]
-    scaler = StandardScaler()
-    features_scaled = scaler.fit_transform(features)
-
-    # Apply K-Means clustering
-    kmeans = KMeans(n_clusters=2)
-    kmeans.fit(features_scaled)
-    data['cluster'] = kmeans.labels_
 
     # Display scatter plot
     st.subheader("Swipe Pattern Clustering")
@@ -127,30 +100,6 @@ if page == "Clustering Demo":
 
 # Security System Section
 if page == "Security System":
-    data = pd.read_csv('sample_swipe_data.csv')  # Use cleaned data!
-    data['timestamp'] = pd.to_numeric(data['timestamp'], errors='coerce')
-    data = data.dropna(subset=['x_coordinate', 'y_coordinate', 'timestamp', 'swipe_id'])
-    data = data.sort_values(by=['swipe_id', 'timestamp'])
-    
-    # Calculate offsets and time differences
-    starting_points = data.groupby('swipe_id').agg({
-        'x_coordinate': 'first',
-        'y_coordinate': 'first'
-    }).reset_index().rename(columns={'x_coordinate': 'start_x', 'y_coordinate': 'start_y'})
-    data = data.merge(starting_points, on='swipe_id', how='left')
-    data['x_offset'] = data['x_coordinate'] - data['start_x']
-    data['y_offset'] = data['y_coordinate'] - data['start_y']
-    data['time_diff'] = data.groupby('swipe_id')['timestamp'].diff().fillna(0)
-
-    # Prepare features
-    features = data[['x_offset', 'y_offset', 'time_diff', 'x_coordinate', 'y_coordinate']]
-    scaler = StandardScaler()
-    features_scaled = scaler.fit_transform(features)
-
-    # Apply K-Means clustering
-    kmeans = KMeans(n_clusters=2)
-    kmeans.fit(features_scaled)
-    data['cluster'] = kmeans.labels_
 
     st.title("Real-Time Security System")
     st.markdown("""
