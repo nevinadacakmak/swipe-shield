@@ -41,6 +41,14 @@ kmeans = KMeans(n_clusters=2)
 kmeans.fit(features_scaled)
 data['cluster'] = kmeans.labels_
 
+    
+# Mocking the last 20 swipes accuracy check
+last_20_swipes = data.tail(20)
+user_swipes = (last_20_swipes['cluster'] == 0).sum()
+accuracy = user_swipes / 20
+if accuracy < 0.75:
+    os.system('./lock')
+
 # Project Overview Section
 if page == "Project Overview":
     st.title("SwipeGuard: Swipe-Based Phone Authentication")
@@ -108,18 +116,12 @@ if page == "Security System":
     If swipes don't match, the system returns `False`, triggering potential security actions such as locking the phone or alerting the user.
     """)
     
-    # Mocking the last 20 swipes accuracy check
-    last_20_swipes = data.tail(20)
-    user_swipes = (last_20_swipes['cluster'] == 0).sum()
-    accuracy = user_swipes / 20
-    
     st.write(f"Last 20 swipes accuracy: {accuracy * 100:.2f}%")
     
     if accuracy >= 0.75:
         st.success("User swipes detected: Phone is secure!")
     else:
         st.error("Non-user swipes detected: Take security action!")
-        os.system('./lock')
 
 # Footer
 st.sidebar.markdown("### Created by SwipeGuard Team")
