@@ -84,7 +84,7 @@ if page == "Clustering Demo":
     st.markdown("Using K-Means clustering to classify swipes into two categories: user and non-user.")
     
     # Load and preprocess the data
-    data = pd.read_csv('cleaned_sample_swipe_data.csv')  # Use cleaned data
+    data = pd.read_csv('sample_swipe_data.csv')  # Use cleaned data!
     data['timestamp'] = pd.to_numeric(data['timestamp'], errors='coerce')
     data = data.dropna(subset=['x_coordinate', 'y_coordinate', 'timestamp', 'swipe_id'])
     data = data.sort_values(by=['swipe_id', 'timestamp'])
@@ -127,7 +127,7 @@ if page == "Clustering Demo":
 
 # Security System Section
 if page == "Security System":
-    data = pd.read_csv('cleaned_sample_swipe_data.csv')  # Use cleaned data
+    data = pd.read_csv('sample_swipe_data.csv')  # Use cleaned data!
     data['timestamp'] = pd.to_numeric(data['timestamp'], errors='coerce')
     data = data.dropna(subset=['x_coordinate', 'y_coordinate', 'timestamp', 'swipe_id'])
     data = data.sort_values(by=['swipe_id', 'timestamp'])
