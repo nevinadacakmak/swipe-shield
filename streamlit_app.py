@@ -15,31 +15,46 @@ st.sidebar.title("SwipeGuard Project")
 st.sidebar.header("Menu")
 page = st.sidebar.selectbox("Choose a section", ["Project Overview", "Data", "Clustering Demo", "Security System"])
 
-# Load and preprocess the data
-data = pd.read_csv('sample_swipe_data.csv')  # Use cleaned data!
-data['timestamp'] = pd.to_numeric(data['timestamp'], errors='coerce')
-data = data.dropna(subset=['x_coordinate', 'y_coordinate', 'timestamp', 'swipe_id'])
-data = data.sort_values(by=['swipe_id', 'timestamp'])
+# Load and preprocess the data (only once)
+if 'data' not in st.session_state:
+    # Load data
+    data = pd.read_csv('sample_swipe_data.csv')  # Use cleaned data!
+    data['timestamp'] = pd.to_numeric(data['timestamp'], errors='coerce')
+    data = data.dropna(subset=['x_coordinate', 'y_coordinate', 'timestamp', 'swipe_id'])
+    data = data.sort_values(by=['swipe_id', 'timestamp'])
 
-# Calculate offsets and time differences
-starting_points = data.groupby('swipe_id').agg({
-    'x_coordinate': 'first',
-    'y_coordinate': 'first'
-}).reset_index().rename(columns={'x_coordinate': 'start_x', 'y_coordinate': 'start_y'})
-data = data.merge(starting_points, on='swipe_id', how='left')
-data['x_offset'] = data['x_coordinate'] - data['start_x']
-data['y_offset'] = data['y_coordinate'] - data['start_y']
-data['time_diff'] = data.groupby('swipe_id')['timestamp'].diff().fillna(0)
+    # Calculate offsets and time differences
+    starting_points = data.groupby('swipe_id').agg({
+        'x_coordinate': 'first',
+        'y_coordinate': 'first'
+    }).reset_index().rename(columns={'x_coordinate': 'start_x', 'y_coordinate': 'start_y'})
+    data = data.merge(starting_points, on='swipe_id', how='left')
+    data['x_offset'] = data['x_coordinate'] - data['start_x']
+    data['y_offset'] = data['y_coordinate'] - data['start_y']
+    data['time_diff'] = data.groupby('swipe_id')['timestamp'].diff().fillna(0)
 
-# Prepare features
-features = data[['x_offset', 'y_offset', 'time_diff', 'x_coordinate', 'y_coordinate']]
-scaler = StandardScaler()
-features_scaled = scaler.fit_transform(features)
+    # Store the data in session state to avoid reloading
+    st.session_state.data = data
+else:
+    data = st.session_state.data
 
-# Apply K-Means clustering
-kmeans = KMeans(n_clusters=2)
-kmeans.fit(features_scaled)
-data['cluster'] = kmeans.labels_
+# Prepare features and clustering (only once)
+if 'clustered_data' not in st.session_state:
+    features = data[['x_offset', 'y_offset', 'time_diff', 'x_coordinate', 'y_coordinate']]
+    scaler = StandardScaler()
+    features_scaled = scaler.fit_transform(features)
+
+    # Apply K-Means clustering
+    kmeans = KMeans(n_clusters=2)
+    kmeans.fit(features_scaled)
+    data['cluster'] = kmeans.labels_
+
+    # Store the clustered data and clustering model
+    st.session_state.clustered_data = data
+    st.session_state.kmeans = kmeans
+else:
+    data = st.session_state.clustered_data
+    kmeans = st.session_state.kmeans
 
 # Project Overview Section
 if page == "Project Overview":
