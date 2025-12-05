@@ -30,7 +30,7 @@ To run the SwipeShield app locally, follow these steps:
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/swipe-shield.git
+   git clone https://github.com/nevinadacakmak/swipe-shield.git
    cd swipe-shield
 
 ### How to run it on your own machine
@@ -107,28 +107,4 @@ To include clustered data in your website, follow these steps:
 3. **Data Processing:** Read the uploaded CSV file and process it to extract the relevant information for your application.
 
 4. **Visualization:** Use Matplotlib or similar libraries to create visual representations of the clustered data within your web app.
-
-## Contributing
-
-Contributions are welcome! To contribute, please fork the repository and submit a pull request. Make sure to follow the coding guidelines and include tests for new features.
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- [Streamlit](https://streamlit.io/) for simplifying web app development.
-- [Scikit-learn](https://scikit-learn.org/) for providing essential machine learning tools.
-- The community for their support and contributions to the project.
-
----
-
-## Contact
-
-For any inquiries or support, feel free to reach out:
 ```
-
-### Instructions:
-- Replace `https://github.com/yourusername/swipe-shield.git` with the actual URL of your GitHub repository.
-- Modify contact information and any other sections as necessary to fit your project and personal details.
